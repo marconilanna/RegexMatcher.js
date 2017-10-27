@@ -16,68 +16,68 @@
 
 var RegexMatcher = function (regex, text) {
 
-	var match = function (regex, text) {
-		if (regex.length === 0)
-			return true
+  var match = function (regex, text) {
+    if (regex.length === 0)
+      return true
 
-		if (regex[0] === '$' && regex.length === 1)
-			return text.length === 0
+    if (regex[0] === '$' && regex.length === 1)
+      return text.length === 0
 
-		if (next(regex, '?'))
-			return matchQuestion(regex[0], regex.slice(2), text)
+    if (next(regex, '?'))
+      return matchQuestion(regex[0], regex.slice(2), text)
 
-		if (next(regex, '+'))
-			return matchPlus(regex[0], regex.slice(2), text)
+    if (next(regex, '+'))
+      return matchPlus(regex[0], regex.slice(2), text)
 
-		if (next(regex, '*'))
-			return matchStar(regex[0], regex.slice(2), text)
+    if (next(regex, '*'))
+      return matchStar(regex[0], regex.slice(2), text)
 
-		if (matchChar(regex[0], text))
-			return match(regex.slice(1), text.slice(1))
+    if (matchChar(regex[0], text))
+      return match(regex.slice(1), text.slice(1))
 
-		return false
-	}
+    return false
+  }
 
-	var matchChar = function (c, text) {
-		return text.length !== 0 && (c === '.' || c === text[0])
-	}
+  var matchChar = function (c, text) {
+    return text.length !== 0 && (c === '.' || c === text[0])
+  }
 
-	var matchQuestion = function (c, regex, text) {
-		return match(regex, text) ||
-				(matchChar(c, text) && match(regex, text.slice(1)))
-	}
+  var matchQuestion = function (c, regex, text) {
+    return match(regex, text) ||
+        (matchChar(c, text) && match(regex, text.slice(1)))
+  }
 
-	var matchPlus = function (c, regex, text) {
-		return matchChar(c, text) && matchStar(c, regex, text.slice(1))
-	}
+  var matchPlus = function (c, regex, text) {
+    return matchChar(c, text) && matchStar(c, regex, text.slice(1))
+  }
 
-	var matchStar = function (c, regex, text) {
-		return scan(regex, text, function (t) {
-			return matchChar(c, t)
-		})
-	}
+  var matchStar = function (c, regex, text) {
+    return scan(regex, text, function (t) {
+      return matchChar(c, t)
+    })
+  }
 
-	var next = function (regex, c) {
-		return regex.length > 1 && regex[1] === c
-	}
+  var next = function (regex, c) {
+    return regex.length > 1 && regex[1] === c
+  }
 
-	var scan = function (regex, text, cond) {
-		var t = text
-		  , mtc = match(regex, t)
-		while (!mtc && cond(t)) {
-			t = t.slice(1)
-			mtc = match(regex, t)
-		}
-		return mtc
-	}
+  var scan = function (regex, text, cond) {
+    var t = text
+      , mtc = match(regex, t)
+    while (!mtc && cond(t)) {
+      t = t.slice(1)
+      mtc = match(regex, t)
+    }
+    return mtc
+  }
 
-	if (regex.length === 0)
-		return true
+  if (regex.length === 0)
+    return true
 
-	if (regex[0] === '^')
-		return match(regex.slice(1), text)
+  if (regex[0] === '^')
+    return match(regex.slice(1), text)
 
-	return scan(regex, text, function (t) {
-		return t.length !== 0
-	})
+  return scan(regex, text, function (t) {
+    return t.length !== 0
+  })
 }
